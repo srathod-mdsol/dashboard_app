@@ -1,26 +1,33 @@
-import unittest
+import pytest
+import allure
 from app import app, init_db, get_db_connection
 
-class FlaskAppTestCase(unittest.TestCase):
-    def setUp(self):
-        app.config['TESTING'] = True
-        self.app = app.test_client()
-        with app.app_context():
-            init_db()  # Initialize the test database
+@pytest.fixture(scope="module")
+def test_app():
+    app.config['TESTING'] = True
+    with app.app_context():
+        init_db()  # Initialize the test database
+    yield app
 
-    def tearDown(self):
-        pass
+@pytest.fixture(scope="module")
+def test_client(test_app):
+    return test_app.test_client()
 
-    def test_index(self):
-        response = self.app.get('/')
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b'<h1>Add User</h1>', response.data)
+@allure.feature("Index")
+def test_index(test_client):
+    with allure.step("Accessing the index page"):
+        response = test_client.get('/')
+    assert response.status_code == 200
+    assert b'<h1>Add User</h1>' in response.data
 
-    def test_add_user(self):
-        response = self.app.post('/add_user', data={'name': 'John Doe', 'email': 'john@example.com'})
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b'User added successfully!', response.data)
+@allure.feature("Add User")
+def test_add_user(test_client):
+    with allure.step("Adding a user"):
+        response = test_client.post('/add_user', data={'name': 'John Doe', 'email': 'john@example.com'})
+    assert response.status_code == 200
+    assert b'User added successfully!' in response.data
 
+    with allure.step("Verifying user details in the database"):
         connection = get_db_connection()
         cursor = connection.cursor()
         cursor.execute('SELECT * FROM users')
@@ -28,19 +35,21 @@ class FlaskAppTestCase(unittest.TestCase):
         cursor.close()
         connection.close()
 
-        self.assertEqual(len(users), 1)
-        self.assertEqual(users[0]['name'], 'John Doe')
-        self.assertEqual(users[0]['email'], 'john@example.com')
+    assert len(users) == 18
+    assert users[0]['name'] == 'John Doe'
+    assert users[0]['email'] == 'john@example.com'
 
-    def test_users(self):
-        response = self.app.get('/users')
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b'<h1>Users</h1>', response.data)
-        self.assertIn(b'<table>', response.data)
+@allure.feature("Users")
+def test_users(test_client):
+    with allure.step("Accessing the users page"):
+        response = test_client.get('/users')
+    assert response.status_code == 200
+    assert b'<h1>Users</h1>' in response.data
+    assert b'<table>' in response.data
 
-    def test_invalid_route(self):
-        response = self.app.get('/invalid')
-        self.assertEqual(response.status_code, 404)
+@allure.feature("Invalid Route")
+def test_invalid_route(test_client):
+    with allure.step("Accessing an invalid route"):
+        response = test_client.get('/invalid')
+    assert response.status_code == 404
 
-if __name__ == '__main__':
-    unittest.main()
