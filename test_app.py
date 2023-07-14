@@ -53,3 +53,5 @@ def test_invalid_route(test_client):
         response = test_client.get('/invalid')
     assert response.status_code == 404
 
+if __name__ == '__main__':
+    pytest.main(['-s', '-v', '--alluredir', 'allure-results'])
