@@ -1,17 +1,17 @@
-findspark==2.0.1
-fqdn==1.5.1
-hive-kernel==0.4.1
-isoduration==20.11.0
-jsonpointer==2.4
-jupyterlab==4.0.3
-pip==23.1.2
-polar==0.0.118
-pyspark==3.4.1
-setuptools==68.0.0
-spylon-kernel==0.4.1
-uri-template==1.3.0
-virtualenv==20.23.1
-webcolors==1.13
+# findspark==2.0.1
+# fqdn==1.5.1
+# hive-kernel==0.4.1
+# isoduration==20.11.0
+# jsonpointer==2.4
+# jupyterlab==4.0.3
+# pip==23.1.2
+# polar==0.0.118
+# pyspark==3.4.1
+# setuptools==68.0.0
+# spylon-kernel==0.4.1
+# uri-template==1.3.0
+# virtualenv==20.23.1
+# webcolors==1.13
 Flask==2.3.2
 Flask-SQLAlchemy==3.0.5
 gunicorn==20.1.0
